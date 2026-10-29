@@ -190,16 +190,16 @@ footer p{margin:0 0 6px;max-width:860px}
     </a>
     <div class="seg" role="radiogroup" aria-label="Currency symbol">
       <button type="button" role="radio" aria-checked="true" data-cur="$">USD $</button>
-      <button type="button" role="radio" aria-checked="false" data-cur="β‚¬">EUR β‚¬</button>
+      <button type="button" role="radio" aria-checked="false" data-cur="€">EUR &euro;</button>
     </div>
   </div>
 </header>
 
 <main id="top" class="wrap">
   <section class="hero" aria-labelledby="h1">
-    <span class="eyebrow">Free diagnostic Β· about 2 minutes</span>
+    <span class="eyebrow">Free diagnostic &middot; about 2 minutes</span>
     <h1 id="h1">Find the revenue your pipeline is <em>already losing</em></h1>
-    <p class="lede">Estimate what weak cold outreach, proposals that stall in β€no decisionβ€ and unbilled scope work cost a B2B firm each year. Every assumption is visible and editable, so you can pressure-test the result against your own numbers.</p>
+    <p class="lede">Estimate what weak cold outreach, proposals that stall in "no decision" and unbilled scope work cost a B2B firm each year. Every assumption is visible and editable, so you can pressure-test the result against your own numbers.</p>
     <ul class="chips">
       <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.2 3L13 4.8" stroke="#0B6B5B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>No sign-up, no email wall</li>
       <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.2 3L13 4.8" stroke="#0B6B5B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Your numbers stay in your browser</li>
@@ -216,7 +216,7 @@ footer p{margin:0 0 6px;max-width:860px}
     <aside class="card results" id="results" aria-labelledby="rl">
       <div class="r-head">
         <div class="r-label" id="rl">Estimated annual revenue at stake</div>
-        <div class="r-big"><span id="lo">$0</span><span class="dash">β€“</span><span id="hi">$0</span></div>
+        <div class="r-big"><span id="lo">$0</span><span class="dash">&ndash;</span><span id="hi">$0</span></div>
         <p class="r-sub">Conservative to expected case. Roughly <strong id="perMonth">$0</strong> per month of delay in the expected case.</p>
       </div>
       <div class="r-body">
@@ -281,7 +281,7 @@ footer p{margin:0 0 6px;max-width:860px}
 <footer>
   <div class="wrap">
     <p><strong>About the numbers.</strong> This is an illustrative model built from the inputs and assumptions above. It is not a forecast, a benchmark or financial advice, and actual results depend on your market, offer and execution. The currency switch changes the symbol only, so enter values in your own currency.</p>
-    <p>Calculations run entirely in your browser. Nothing you enter is sent or stored. Β© 2026 Conversionlogic.</p>
+    <p>Calculations run entirely in your browser. Nothing you enter is sent or stored. &copy; 2026 Conversionlogic.</p>
   </div>
 </footer>
 
@@ -305,27 +305,27 @@ footer p{margin:0 0 6px;max-width:860px}
         { k: 'o_tgt', label: 'Reply rate you could reach', hint: 'Keep this modest. A 1 to 2 point lift is realistic for well-targeted outreach.', min: 0.2, max: 8, step: 0.1, def: 1.5, type: 'pct1' },
         { k: 'o_acv', label: 'Average first-year contract value', hint: 'What one new client is worth in their first year.', min: 1000, max: 100000, step: 500, def: 12000, type: 'money' }
       ],
-      warn: function (s) { return s.o_tgt <= s.o_cur ? 'The target rate is at or below todayβ€™s rate, so no outreach upside is modelled.' : ''; },
+      warn: function (s) { return s.o_tgt <= s.o_cur ? 'The target rate is at or below today's rate, so no outreach upside is modelled.' : ''; },
       how: function (s, c) {
-        return 'Extra positive replies Γ— share that become meetings Γ— meeting close rate Γ— contract value Γ— 12 months.' +
-          '<code>' + fmtInt(s.o_vol) + ' emails Γ— ' + (Math.max(0, s.o_tgt - s.o_cur)).toFixed(1) + ' pt lift = ' + c.extraReplies.toFixed(1) + ' extra replies/mo β†’ ' +
-          c.meetings.toFixed(1) + ' meetings β†’ ' + c.deals.toFixed(2) + ' deals/mo Γ— ' + full(s.o_acv) + ' Γ— 12 = ' + full(c.outbound) + '</code>';
+        return 'Extra positive replies × share that become meetings × meeting close rate × contract value × 12 months.' +
+          '<code>' + fmtInt(s.o_vol) + ' emails × ' + (Math.max(0, s.o_tgt - s.o_cur)).toFixed(1) + ' pt lift = ' + c.extraReplies.toFixed(1) + ' extra replies/mo → ' +
+          c.meetings.toFixed(1) + ' meetings → ' + c.deals.toFixed(2) + ' deals/mo × ' + full(s.o_acv) + ' × 12 = ' + full(c.outbound) + '</code>';
       },
       action: { t: 'Rebuild outreach around triggers', d: 'Write about a specific, observable event at the prospect instead of filtering by headcount, and check list freshness first so bounces do not cap your results.', href: 'https://medium.com/@conversionlogic/why-your-cold-outreach-died-this-year-and-the-3-step-trigger-framework-that-revives-it-08bf79bd1cb2', l: 'Read the trigger framework' }
     },
     { id: 'proposals', n: 2, color: '#C2542D', name: 'Stalled proposals',
-      title: 'Proposals stalling in β€no decisionβ€', sub: 'Qualified deals that go quiet instead of being won or lost to a competitor.',
+      title: 'Proposals stalling in "no decision"', sub: 'Qualified deals that go quiet instead of being won or lost to a competitor.',
       fields: [
         { k: 'p_cnt', label: 'Proposals sent per month', hint: 'Formal proposals or quotes to qualified buyers.', min: 1, max: 40, step: 1, def: 6, type: 'int' },
         { k: 'p_acv', label: 'Average proposal value', hint: 'First-year value of a typical proposal.', min: 2000, max: 250000, step: 1000, def: 20000, type: 'money' },
-        { k: 'p_stall', label: 'Share that end in β€no decisionβ€', hint: 'Check your CRM. Many B2B teams see 40% or more of qualified deals stall without a competitor winning.', min: 5, max: 70, step: 1, def: 40, type: 'pct0' }
+        { k: 'p_stall', label: 'Share that end in "no decision"', hint: 'Check your CRM. Many B2B teams see 40% or more of qualified deals stall without a competitor winning.', min: 5, max: 70, step: 1, def: 40, type: 'pct0' }
       ],
       warn: function () { return ''; },
       how: function (s, c) {
-        return 'Proposals per year Γ— value Γ— share stalled Γ— share you could realistically recover.' +
-          '<code>' + fmtInt(s.p_cnt) + ' Γ— 12 Γ— ' + full(s.p_acv) + ' Γ— ' + Math.round(s.p_stall) + '% = ' + full(c.stalledVal) + ' stalled Γ— ' + Math.round(s.a_rec) + '% recoverable = ' + full(c.proposals) + '</code>';
+        return 'Proposals per year × value × share stalled × share you could realistically recover.' +
+          '<code>' + fmtInt(s.p_cnt) + ' × 12 × ' + full(s.p_acv) + ' × ' + Math.round(s.p_stall) + '% = ' + full(c.stalledVal) + ' stalled × ' + Math.round(s.a_rec) + '% recoverable = ' + full(c.proposals) + '</code>';
       },
-      action: { t: 'Remove hedging from proposals', d: 'Replace phrases such as β€we aim toβ€ and β€reasonable effortsβ€ with specific commitments, and give the buying committee a safe way to say yes: milestones, a defined exit and named owners.', href: 'https://promptbase.com/bundle/b2b-deal-momentum-pitch-enabler-kit?via=kevivs', l: 'See the deal momentum kit' }
+      action: { t: 'Remove hedging from proposals', d: 'Replace phrases such as "we aim to" and "reasonable efforts" with specific commitments, and give the buying committee a safe way to say yes: milestones, a defined exit and named owners.', href: 'https://promptbase.com/bundle/b2b-deal-momentum-pitch-enabler-kit?via=kevivs', l: 'See the deal momentum kit' }
     },
     { id: 'scope', n: 3, color: '#B8892B', name: 'Unbilled scope work',
       title: 'Unbilled scope work', sub: 'Out-of-scope requests and revisions delivered without a change order.',
@@ -336,16 +336,16 @@ footer p{margin:0 0 6px;max-width:860px}
       ],
       warn: function () { return ''; },
       how: function (s, c) {
-        return 'Clients Γ— unbilled hours Γ— hourly rate Γ— 12 months Γ— share you could realistically bill.' +
-          '<code>' + fmtInt(s.s_acc) + ' Γ— ' + fmtInt(s.s_hrs) + ' h Γ— ' + full(s.s_rate) + ' Γ— 12 Γ— ' + Math.round(s.a_bill) + '% = ' + full(c.scope) + '</code>';
+        return 'Clients × unbilled hours × hourly rate × 12 months × share you could realistically bill.' +
+          '<code>' + fmtInt(s.s_acc) + ' × ' + fmtInt(s.s_hrs) + ' h × ' + full(s.s_rate) + ' × 12 × ' + Math.round(s.a_bill) + '% = ' + full(c.scope) + '</code>';
       },
       action: { t: 'Put change orders in writing', d: 'Define scope in a short charter and require a priced change order once a request passes an agreed hours threshold.', href: 'https://promptbase.com/bundle/freelance-client-scope-defense-kit?via=kevivs', l: 'See the scope-control kit' }
     }
   ];
 
   var ASSUME = [
-    { k: 'a_meet', label: 'Positive reply β†’ meeting held', hint: 'Share of interested replies that turn into a real conversation.', min: 5, max: 80, step: 1, def: 30, type: 'pct0' },
-    { k: 'a_win', label: 'Meeting β†’ closed-won', hint: 'Close rate on qualified first meetings.', min: 2, max: 60, step: 1, def: 15, type: 'pct0' },
+    { k: 'a_meet', label: 'Positive reply → meeting held', hint: 'Share of interested replies that turn into a real conversation.', min: 5, max: 80, step: 1, def: 30, type: 'pct0' },
+    { k: 'a_win', label: 'Meeting → closed-won', hint: 'Close rate on qualified first meetings.', min: 2, max: 60, step: 1, def: 15, type: 'pct0' },
     { k: 'a_rec', label: 'Stalled proposals you could recover', hint: 'Not every stalled deal can be saved. This is the realistic share.', min: 5, max: 60, step: 1, def: 20, type: 'pct0' },
     { k: 'a_bill', label: 'Unbilled hours you could bill', hint: 'Some goodwill work is worth keeping. This is the billable share.', min: 20, max: 100, step: 5, def: 70, type: 'pct0' },
     { k: 'a_cons', label: 'Conservative case, as % of expected', hint: 'Sets the low end of the range shown at the top.', min: 20, max: 90, step: 5, def: 50, type: 'pct0' }
@@ -473,7 +473,7 @@ footer p{margin:0 0 6px;max-width:860px}
     var ev = g.total * m / 12, cv = g.low * m / 12;
     var hc = $('#hc'); hc.setAttribute('cx', g.x(m)); hc.setAttribute('cy', g.y(ev)); hc.style.display = '';
     var tt = $('#tt'), wr = $('#chartWrap').getBoundingClientRect();
-    tt.innerHTML = '<b>' + (m === 0 ? 'Today' : 'Month ' + m) + '</b><br>' + compact(ev) + ' expected Β· ' + compact(cv) + ' conservative';
+    tt.innerHTML = '<b>' + (m === 0 ? 'Today' : 'Month ' + m) + '</b><br>' + compact(ev) + ' expected &middot; ' + compact(cv) + ' conservative';
     tt.style.left = (g.x(m) * r.width / g.W) + 'px';
     tt.style.top = (g.y(ev) * r.height / (230)) + 'px';
     tt.style.opacity = 1;
@@ -486,8 +486,8 @@ footer p{margin:0 0 6px;max-width:860px}
     tween($('#lo'), c.low, compact);
     tween($('#hi'), c.total, compact);
     tween($('#perMonth'), c.total / 12, compact);
-    tween($('#mbarV'), c.total, function (v) { return compact(c.low) + ' β€“ ' + compact(v); });
-    $('#mbarV').textContent = compact(c.low) + ' β€“ ' + compact(c.total);
+    tween($('#mbarV'), c.total, function (v) { return compact(c.low) + ' &ndash; ' + compact(v); });
+    $('#mbarV').textContent = compact(c.low) + ' &ndash; ' + compact(c.total);
 
     var total = c.total || 1;
     $('#bar').innerHTML = MODULES.map(function (m) {
@@ -505,7 +505,7 @@ footer p{margin:0 0 6px;max-width:860px}
       return '<li><span class="rk" style="background:' + m.color + '">' + (i + 1) + '</span><div>' +
         '<h4>' + m.action.t + '<span>' + compact(c.parts[m.id]) + '</span></h4>' +
         '<p>' + m.action.d + '</p>' +
-        '<a href="' + m.action.href + '" target="_blank" rel="noopener noreferrer">' + m.action.l + ' β†’</a></div></li>';
+        '<a href="' + m.action.href + '" target="_blank" rel="noopener noreferrer">' + m.action.l + ' →</a></div></li>';
     }).join('');
 
     MODULES.forEach(function (m) {
@@ -567,7 +567,7 @@ footer p{margin:0 0 6px;max-width:860px}
   function persist() {
     var p = new URLSearchParams();
     ALL.forEach(function (f) { if (state[f.k] !== f.def) p.set(f.k, state[f.k]); });
-    if (cur === 'β‚¬') p.set('c', 'eur');
+    if (cur === '€') p.set('c', 'eur');
     var h = p.toString();
     try { history.replaceState(null, '', h ? '#' + h : location.pathname + location.search); } catch (e) {}
   }
@@ -577,8 +577,8 @@ footer p{margin:0 0 6px;max-width:860px}
       if (p.has(f.k)) { var v = parseFloat(p.get(f.k)); if (isFinite(v) && v >= 0) state[f.k] = Math.min(v, f.max * 50); }
     });
     if (p.get('c') === 'eur') {
-      cur = 'β‚¬';
-      $$('.seg button').forEach(function (x) { x.setAttribute('aria-checked', x.dataset.cur === 'β‚¬' ? 'true' : 'false'); });
+      cur = '€';
+      $$('.seg button').forEach(function (x) { x.setAttribute('aria-checked', x.dataset.cur === '€' ? 'true' : 'false'); });
     }
   }
 
