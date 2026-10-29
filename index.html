@@ -1,472 +1,634 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>B2B Revenue Leakage & Pipeline Forensics Calculator | Conversionlogic</title>
-  <meta name="description" content="Quantify your enterprise revenue loss across cold outreach bounces, proposal 'No Decision' stalls, and retainer scope creep in under 2 minutes.">
-  
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            brand: {
-              50: '#f0fdfa',
-              500: '#14b8a6',
-              600: '#0d9488',
-              900: '#134e4a',
-            },
-            loss: {
-              500: '#f43f5e',
-              600: '#e11d48',
-            }
-          },
-          fontFamily: {
-            sans: ['Inter', 'system-ui', 'sans-serif'],
-          }
-        }
-      }
-    }
-  </script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Revenue Leakage Diagnostic for B2B Pipelines | Conversionlogic</title>
+<meta name="description" content="A 2-minute diagnostic that estimates the annual revenue at stake in weak cold outreach, stalled proposals and unbilled scope work. Every assumption is visible and editable.">
+<meta name="theme-color" content="#0F1B2D">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Revenue Leakage Diagnostic for B2B Pipelines">
+<meta property="og:description" content="Estimate what weak outreach, stalled proposals and unbilled scope work cost you each year. Conservative by design, every assumption editable.">
+<meta property="og:url" content="https://mitsaken.github.io/b2b-pipeline-calculator/">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230F1B2D'/%3E%3Cpath d='M9 21l5-6 4 3 5-8' fill='none' stroke='%2345C4A8' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F6F4EE; --surface:#FFFFFF; --ink:#0F1B2D; --ink2:#3B4A5E; --muted:#5B6773;
+  --line:#E2DED3; --line2:#EEEBE3;
+  --accent:#0B6B5B; --accent-hover:#085748; --accent-soft:#E2F1ED; --mint:#45C4A8;
+  --c1:#1F4E79; --c2:#C2542D; --c3:#B8892B;
+  --radius:16px;
+  --shadow:0 1px 2px rgba(15,27,45,.05),0 10px 30px rgba(15,27,45,.06);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+:focus-visible{outline:3px solid var(--mint);outline-offset:2px;border-radius:6px}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px}
 
-  <!-- Google Fonts: Inter -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+/* Header */
+.top{position:sticky;top:0;z-index:30;background:rgba(246,244,238,.88);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;justify-content:space-between;height:64px;gap:16px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none}
+.logo{width:34px;height:34px;border-radius:9px;background:var(--ink);display:grid;place-items:center}
+.brand b{font-size:15px;letter-spacing:.06em}
+.brand small{display:block;font-size:11.5px;color:var(--muted);letter-spacing:.02em;margin-top:-2px}
+.seg{display:inline-flex;background:#ECE8DD;border-radius:10px;padding:3px}
+.seg button{border:0;background:transparent;font:600 12.5px Inter,sans-serif;color:var(--ink2);padding:6px 12px;border-radius:8px;cursor:pointer}
+.seg button[aria-checked="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(15,27,45,.15)}
 
-  <!-- Chart.js CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+/* Hero */
+.hero{padding:56px 0 30px;max-width:780px}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;color:var(--accent);background:var(--accent-soft);padding:5px 12px;border-radius:999px;letter-spacing:.02em}
+h1{font-family:Newsreader,Georgia,serif;font-weight:600;font-size:clamp(34px,5.4vw,56px);line-height:1.07;letter-spacing:-.015em;margin:18px 0 16px}
+h1 em{font-style:normal;background:linear-gradient(transparent 62%,rgba(69,196,168,.38) 62%)}
+.lede{font-size:17.5px;color:var(--ink2);max-width:660px;margin:0 0 20px}
+.chips{display:flex;flex-wrap:wrap;gap:8px 18px;margin:0;padding:0;list-style:none;font-size:13.5px;color:var(--ink2)}
+.chips li{display:flex;align-items:center;gap:7px}
+.chips svg{flex:none}
 
-  <style>
-    body { font-family: 'Inter', sans-serif; }
-    input[type=range] {
-      accent-color: #14b8a6;
-    }
-    @media print {
-      .no-print { display: none !important; }
-      body { background: white !important; color: black !important; }
-      .print-card { border: 1px solid #ccc !important; background: white !important; color: black !important; }
-    }
-  </style>
+/* Layout */
+.grid{display:grid;grid-template-columns:minmax(0,1.02fr) minmax(0,.98fr);gap:28px;align-items:start;padding:14px 0 32px}
+.stack{display:grid;gap:18px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.mod{padding:22px 24px 8px}
+.mod-h{display:flex;gap:14px;align-items:flex-start;margin-bottom:6px}
+.badge{flex:none;width:32px;height:32px;border-radius:9px;display:grid;place-items:center;color:#fff;font-weight:700;font-size:14px}
+.mod h2{font-size:17px;margin:0;letter-spacing:-.01em}
+.mod-h p{margin:2px 0 0;color:var(--muted);font-size:13.5px}
+.field{padding:14px 0;border-top:1px solid var(--line2)}
+.mod .field:first-of-type{margin-top:12px}
+.field-top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+label{font-weight:600;font-size:14px}
+.hint{margin:3px 0 10px;color:var(--muted);font-size:12.8px;line-height:1.45}
+.num{display:flex;align-items:center;gap:2px;background:#FAF9F5;border:1px solid var(--line);border-radius:10px;padding:0 10px;min-width:112px;max-width:132px}
+.num:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px rgba(11,107,91,.15)}
+.num input{width:100%;border:0;background:transparent;text-align:right;font:600 15px Inter,sans-serif;color:var(--ink);padding:8px 0;font-variant-numeric:tabular-nums;outline:none}
+.aff{color:var(--muted);font-weight:600;font-size:14px}
+.range{-webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:999px;margin:6px 0 0;cursor:pointer;
+  background:linear-gradient(to right,var(--mc,var(--accent)) var(--p,0%),#E7E3D8 var(--p,0%))}
+.range::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:#fff;border:3px solid var(--mc,var(--accent));box-shadow:0 2px 6px rgba(15,27,45,.25)}
+.range::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:#fff;border:3px solid var(--mc,var(--accent));box-shadow:0 2px 6px rgba(15,27,45,.25)}
+.warn{display:none;margin:4px 0 10px;padding:9px 12px;border-radius:10px;background:#FFF4E5;color:#7A4A00;font-size:13px}
+.warn.on{display:block}
+details.how{border-top:1px solid var(--line2);margin-top:6px;padding:12px 0 14px}
+details.how summary{cursor:pointer;font-weight:600;font-size:13.5px;color:var(--accent);list-style:none;display:flex;align-items:center;gap:8px}
+details.how summary::-webkit-details-marker{display:none}
+details.how summary::before{content:"+";display:grid;place-items:center;width:20px;height:20px;border-radius:6px;background:var(--accent-soft);font-weight:700}
+details.how[open] summary::before{content:"\2212"}
+.calc{margin:10px 0 0;font-size:13.2px;color:var(--ink2)}
+.calc code{display:block;margin-top:8px;padding:10px 12px;background:#FAF9F5;border:1px solid var(--line2);border-radius:10px;font:500 12.8px/1.55 ui-monospace,SFMono-Regular,Consolas,monospace;color:var(--ink);white-space:normal}
+
+/* Results */
+.results{position:sticky;top:80px;overflow:hidden}
+.r-head{background:radial-gradient(120% 140% at 100% 0%,#17406B 0%,var(--ink) 55%);color:#fff;padding:26px 26px 24px}
+.r-label{font-size:12.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#A9C3D9}
+.r-big{font-size:clamp(34px,4.6vw,50px);font-weight:700;letter-spacing:-.025em;line-height:1.1;margin:8px 0 4px;font-variant-numeric:tabular-nums}
+.r-big span.dash{color:#6F8CA6;font-weight:500;margin:0 .15em}
+.r-sub{margin:0;color:#C6D6E4;font-size:14px}
+.r-sub strong{color:#fff}
+.r-body{padding:22px 26px 8px}
+.r-body h3{font-size:12.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin:0 0 12px;font-weight:600}
+.bar{display:flex;height:12px;border-radius:999px;overflow:hidden;background:#ECE8DD;gap:2px}
+.bar span{display:block;height:100%;transition:width .45s cubic-bezier(.2,.8,.2,1)}
+.rows{list-style:none;margin:14px 0 0;padding:0;display:grid;gap:10px}
+.rows li{display:grid;grid-template-columns:12px 1fr auto auto;gap:10px;align-items:center;font-size:14px}
+.dot{width:10px;height:10px;border-radius:50%}
+.rows .v{font-weight:700;font-variant-numeric:tabular-nums}
+.rows .pc{color:var(--muted);font-size:12.5px;min-width:38px;text-align:right;font-variant-numeric:tabular-nums}
+.sec{padding:20px 0 4px;border-top:1px solid var(--line2);margin-top:20px}
+.chart-wrap{position:relative}
+.chart-wrap svg{width:100%;height:auto;display:block;overflow:visible}
+.tt{position:absolute;pointer-events:none;background:var(--ink);color:#fff;font-size:12px;line-height:1.4;padding:7px 10px;border-radius:8px;transform:translate(-50%,-110%);white-space:nowrap;opacity:0;transition:opacity .12s}
+.legend{display:flex;gap:18px;flex-wrap:wrap;font-size:12.5px;color:var(--muted);margin-top:6px}
+.legend i{display:inline-block;width:18px;height:0;border-top:3px solid var(--accent);vertical-align:middle;margin-right:6px}
+.legend i.d{border-top:2px dashed #7A8794}
+.start{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+.start li{display:grid;grid-template-columns:30px 1fr;gap:12px;padding:14px;border:1px solid var(--line);border-radius:12px;background:#FCFBF8}
+.start .rk{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;font-size:13px}
+.start h4{margin:0;font-size:14.5px;display:flex;justify-content:space-between;gap:10px}
+.start h4 span{font-variant-numeric:tabular-nums;color:var(--ink2);font-weight:600}
+.start p{margin:4px 0 6px;font-size:13.2px;color:var(--ink2)}
+.start a{font-size:13px;font-weight:600;color:var(--accent);text-decoration:none}
+.start a:hover{text-decoration:underline}
+.acts{display:flex;flex-wrap:wrap;gap:10px;padding:18px 26px 24px}
+.btn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:#fff;color:var(--ink);font:600 13.5px Inter,sans-serif;padding:10px 14px;border-radius:10px;cursor:pointer;text-decoration:none}
+.btn:hover{border-color:#C9C4B6;background:#FAF9F5}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.pri:hover{background:var(--accent-hover)}
+
+/* Assumptions */
+.assume{padding:24px 26px}
+.assume h2,.cta h2{font-size:19px;margin:0 0 4px;letter-spacing:-.01em}
+.assume>p{margin:0 0 6px;color:var(--muted);font-size:13.8px}
+.assume .field:first-of-type{margin-top:10px}
+@media (min-width:1001px){#assumptions{display:grid;grid-template-columns:1fr 1fr;column-gap:48px}}
+
+/* CTA */
+.cta{padding:12px 0 56px}
+.cta>p{color:var(--ink2);max-width:640px;margin:4px 0 18px}
+.cards3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.cards3 .card{padding:22px;display:flex;flex-direction:column;gap:8px}
+.cards3 small{font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.cards3 h3{margin:0;font-size:16.5px;letter-spacing:-.01em}
+.cards3 p{margin:0 0 8px;color:var(--ink2);font-size:13.8px;flex:1}
+.cards3 .btn{align-self:flex-start}
+footer{border-top:1px solid var(--line);padding:26px 0 90px;color:var(--muted);font-size:12.8px}
+footer p{margin:0 0 6px;max-width:860px}
+
+/* Mobile bar + toast */
+.mbar{display:none;position:fixed;left:12px;right:12px;bottom:12px;z-index:40;background:var(--ink);color:#fff;border-radius:14px;padding:12px 16px;align-items:center;justify-content:space-between;gap:12px;box-shadow:0 10px 30px rgba(15,27,45,.35)}
+.mbar small{display:block;color:#A9C3D9;font-size:11.5px}
+.mbar b{font-size:17px;font-variant-numeric:tabular-nums}
+.mbar a{background:var(--mint);color:#06281F;font-weight:700;font-size:13px;padding:9px 13px;border-radius:9px;text-decoration:none}
+.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);background:var(--ink);color:#fff;padding:10px 16px;border-radius:10px;font-size:13.5px;opacity:0;pointer-events:none;transition:.25s;z-index:60}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.print-meta{display:none}
+
+@media (max-width:1000px){
+  .grid{grid-template-columns:1fr}
+  .results{position:static}
+  .cards3{grid-template-columns:1fr}
+  .mbar.show{display:flex}
+}
+@media (max-width:520px){
+  .wrap{padding:0 16px}
+  .mod{padding:18px 16px 6px}
+  .r-head,.r-body,.acts{padding-left:18px;padding-right:18px}
+  .brand small{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  *{transition:none!important;animation:none!important}
+  html{scroll-behavior:auto}
+}
+@media print{
+  body{background:#fff}
+  .top,.mbar,.toast,.cta,.acts,.chips,.eyebrow{display:none!important}
+  .print-meta{display:block;color:var(--muted);font-size:12px;margin-bottom:8px}
+  .grid{grid-template-columns:1fr;gap:16px}
+  .card{box-shadow:none;break-inside:avoid}
+  .results{position:static}
+  .r-head{background:var(--ink)!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .bar span,.badge,.start .rk,.dot{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  details.how{display:none}
+  .hero{padding:12px 0}
+}
+</style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen selection:bg-teal-500 selection:text-white">
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="Conversionlogic">
+      <span class="logo" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 32 32"><path d="M7 22l6-7 5 4 7-10" fill="none" stroke="#45C4A8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      <span><b>CONVERSIONLOGIC</b><small>Revenue Leakage Diagnostic</small></span>
+    </a>
+    <div class="seg" role="radiogroup" aria-label="Currency symbol">
+      <button type="button" role="radio" aria-checked="true" data-cur="$">USD $</button>
+      <button type="button" role="radio" aria-checked="false" data-cur="β‚¬">EUR β‚¬</button>
+    </div>
+  </div>
+</header>
 
-  <!-- Top Navigation Bar -->
-  <header class="border-b border-slate-800/80 bg-slate-900/60 backdrop-blur sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-      <div class="flex items-center space-x-3">
-        <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-teal-500 to-emerald-400 flex items-center justify-center font-black text-slate-950 text-sm tracking-wider">
-          CL
+<main id="top" class="wrap">
+  <section class="hero" aria-labelledby="h1">
+    <span class="eyebrow">Free diagnostic Β· about 2 minutes</span>
+    <h1 id="h1">Find the revenue your pipeline is <em>already losing</em></h1>
+    <p class="lede">Estimate what weak cold outreach, proposals that stall in β€no decisionβ€ and unbilled scope work cost a B2B firm each year. Every assumption is visible and editable, so you can pressure-test the result against your own numbers.</p>
+    <ul class="chips">
+      <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.2 3L13 4.8" stroke="#0B6B5B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>No sign-up, no email wall</li>
+      <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.2 3L13 4.8" stroke="#0B6B5B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Your numbers stay in your browser</li>
+      <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.2 3L13 4.8" stroke="#0B6B5B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Conservative by design</li>
+    </ul>
+    <p class="print-meta" id="printMeta"></p>
+  </section>
+
+  <noscript><p class="card" style="padding:18px">This diagnostic needs JavaScript to calculate results.</p></noscript>
+
+  <div class="grid">
+    <div class="stack" id="modules"></div>
+
+    <aside class="card results" id="results" aria-labelledby="rl">
+      <div class="r-head">
+        <div class="r-label" id="rl">Estimated annual revenue at stake</div>
+        <div class="r-big"><span id="lo">$0</span><span class="dash">β€“</span><span id="hi">$0</span></div>
+        <p class="r-sub">Conservative to expected case. Roughly <strong id="perMonth">$0</strong> per month of delay in the expected case.</p>
+      </div>
+      <div class="r-body">
+        <h3>Where it comes from (expected case)</h3>
+        <div class="bar" id="bar" role="img" aria-label="Share of revenue at stake by source"></div>
+        <ul class="rows" id="rows"></ul>
+
+        <div class="sec">
+          <h3>Cost of waiting, cumulative over 12 months</h3>
+          <div class="chart-wrap" id="chartWrap">
+            <svg id="chart" viewBox="0 0 560 230" role="img" aria-label="Cumulative revenue at stake over 12 months"></svg>
+            <div class="tt" id="tt"></div>
+          </div>
+          <div class="legend"><span><i></i>Expected</span><span><i class="d"></i>Conservative</span></div>
         </div>
-        <div>
-          <span class="font-bold text-slate-100 tracking-tight text-lg">CONVERSIONLOGIC</span>
-          <span class="hidden sm:inline-block ml-2 text-xs font-medium px-2 py-0.5 rounded bg-slate-800 text-teal-400 border border-slate-700">Forensics Engine v2.0</span>
+
+        <div class="sec">
+          <h3>Where to start</h3>
+          <ol class="start" id="start"></ol>
         </div>
       </div>
-      
-      <!-- Right Controls: Currency & Print -->
-      <div class="flex items-center space-x-3 no-print">
-        <div class="flex items-center bg-slate-800/90 rounded-lg p-1 border border-slate-700 text-xs font-semibold">
-          <button id="curr-usd" onclick="setCurrency('$')" class="px-2.5 py-1 rounded bg-teal-500 text-slate-950 transition">USD ($)</button>
-          <button id="curr-eur" onclick="setCurrency('€')" class="px-2.5 py-1 rounded text-slate-300 hover:text-white transition">EUR (€)</button>
-        </div>
-        <button onclick="window.print()" class="hidden md:flex items-center space-x-1 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-medium text-slate-200 transition">
-          <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
-          <span>Export Audit</span>
-        </button>
+      <div class="acts">
+        <button class="btn pri" type="button" id="bCopy">Copy summary</button>
+        <button class="btn" type="button" id="bLink">Copy link with my inputs</button>
+        <button class="btn" type="button" id="bPrint">Save as PDF</button>
+      </div>
+    </aside>
+  </div>
+
+  <section class="card assume" aria-labelledby="ah">
+    <h2 id="ah">Assumptions behind the estimate</h2>
+    <p>These are deliberately conservative defaults, not industry facts. Replace them with your own conversion data for a more accurate result.</p>
+    <div id="assumptions"></div>
+  </section>
+
+  <section class="cta" aria-labelledby="ch" style="margin-top:36px">
+    <h2 id="ch">Turn the diagnosis into a fix</h2>
+    <p>Start with whichever source of leakage ranks highest above. These are the frameworks and toolkits behind each one.</p>
+    <div class="cards3">
+      <div class="card">
+        <small>Read</small>
+        <h3>The 3-step trigger framework</h3>
+        <p>How to write outreach around a specific friction event instead of a headcount filter, in about 75 words.</p>
+        <a class="btn" href="https://medium.com/@conversionlogic/why-your-cold-outreach-died-this-year-and-the-3-step-trigger-framework-that-revives-it-08bf79bd1cb2" target="_blank" rel="noopener noreferrer">Read the article</a>
+      </div>
+      <div class="card">
+        <small>Toolkits</small>
+        <h3>Prompt kits for B2B deals</h3>
+        <p>Ready-to-use prompt bundles for outreach, proposals and deal momentum, built for ChatGPT, Claude and Gemini.</p>
+        <a class="btn" href="https://promptbase.com/bundle/roi-b2b-outreach-proposal-closer-pack?via=kevivs" target="_blank" rel="noopener noreferrer">Browse the kits</a>
+      </div>
+      <div class="card">
+        <small>Full system</small>
+        <h3>Elite B2B Sales Architecture OS</h3>
+        <p>The complete operating system for outbound, proposals and delivery governance, in one package.</p>
+        <a class="btn pri" href="https://payhip.com/b/0Kscf?utm_source=leakage-calculator&utm_medium=web&utm_campaign=cta" target="_blank" rel="noopener noreferrer">See what is included</a>
       </div>
     </div>
-  </header>
+  </section>
+</main>
 
-  <!-- Hero Section -->
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
-    <div class="text-center max-w-3xl mx-auto mb-10">
-      <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs font-semibold mb-4">
-        <span class="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
-        <span>B2B Pipeline & Commercial Drift Diagnostic</span>
-      </div>
-      <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-white mb-4">
-        How Much ARR Is Your Pipeline <span class="text-transparent bg-clip-text bg-gradient-to-r from-rose-400 to-amber-400">Silently Leaking?</span>
-      </h1>
-      <p class="text-slate-400 text-sm sm:text-base leading-relaxed">
-        B2B firms don't lose revenue from high pricing or competitors. They bleed capital through 3 silent failure modes: <strong class="text-slate-200">unverified cold outreach</strong>, <strong class="text-slate-200">proposals stalled in "No Decision"</strong>, and <strong class="text-slate-200">scope creep drift</strong>.
-      </p>
-    </div>
+<footer>
+  <div class="wrap">
+    <p><strong>About the numbers.</strong> This is an illustrative model built from the inputs and assumptions above. It is not a forecast, a benchmark or financial advice, and actual results depend on your market, offer and execution. The currency switch changes the symbol only, so enter values in your own currency.</p>
+    <p>Calculations run entirely in your browser. Nothing you enter is sent or stored. Β© 2026 Conversionlogic.</p>
+  </div>
+</footer>
 
-    <!-- Live Executive Ticker -->
-    <div class="mb-10 p-6 sm:p-8 rounded-2xl bg-gradient-to-br from-slate-900 via-slate-900 to-slate-950 border border-slate-800 shadow-2xl relative overflow-hidden">
-      <div class="absolute -top-24 -right-24 w-96 h-96 bg-rose-500/10 rounded-full blur-3xl pointer-events-none"></div>
-      <div class="absolute -bottom-24 -left-24 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl pointer-events-none"></div>
-      
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-6 items-center relative z-10">
-        <div class="md:col-span-2">
-          <p class="text-xs uppercase tracking-wider font-semibold text-slate-400 mb-1">Identified Annual Revenue Leakage</p>
-          <div class="flex items-baseline space-x-2">
-            <span id="total-annual-leakage" class="text-4xl sm:text-5xl md:text-6xl font-black text-rose-500 tracking-tight">$0</span>
-            <span class="text-xs text-rose-400 font-medium">/ year</span>
-          </div>
-          <p class="text-xs text-slate-400 mt-2">
-            Equivalent to <span id="monthly-leakage-stat" class="font-bold text-slate-200">$0</span> lost every month across outreach, stalled proposals, and unbilled delivery.
-          </p>
-        </div>
+<div class="mbar" id="mbar" aria-hidden="true"><div><small>At stake per year</small><b id="mbarV">$0</b></div><a href="#results">See breakdown</a></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="sr-only" id="live" aria-live="polite"></div>
 
-        <div class="grid grid-cols-3 md:col-span-2 gap-3 text-center sm:text-left">
-          <div class="p-3 rounded-xl bg-slate-950/60 border border-slate-800/80">
-            <p class="text-[10px] text-slate-400 uppercase font-bold">Outbound Burn</p>
-            <p id="kpi-outbound" class="text-base sm:text-lg font-bold text-amber-400 mt-1">$0</p>
-          </div>
-          <div class="p-3 rounded-xl bg-slate-950/60 border border-slate-800/80">
-            <p class="text-[10px] text-slate-400 uppercase font-bold">Stalled Deals</p>
-            <p id="kpi-proposals" class="text-base sm:text-lg font-bold text-rose-400 mt-1">$0</p>
-          </div>
-          <div class="p-3 rounded-xl bg-slate-950/60 border border-slate-800/80">
-            <p class="text-[10px] text-slate-400 uppercase font-bold">Scope Creep</p>
-            <p id="kpi-scope" class="text-base sm:text-lg font-bold text-purple-400 mt-1">$0</p>
-          </div>
-        </div>
-      </div>
-    </div>
+<script>
+(function () {
+  'use strict';
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    <!-- Diagnostic Calculator Grid -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-12">
-      
-      <!-- Input Controls Column (7 Cols) -->
-      <div class="lg:col-span-7 space-y-6">
-
-        <!-- Module 1: Cold Outreach & Deliverability -->
-        <div class="p-6 rounded-xl bg-slate-900 border border-slate-800 shadow-sm print-card">
-          <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
-            <div class="flex items-center space-x-2.5">
-              <span class="w-6 h-6 rounded-md bg-amber-500/10 text-amber-400 flex items-center justify-center font-bold text-xs">1</span>
-              <h2 class="font-bold text-slate-100 text-sm sm:text-base">Outbound Pipeline Inefficiency</h2>
-            </div>
-            <span class="text-xs font-medium text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">Deliverability & Matrix</span>
-          </div>
-
-          <div class="space-y-4 text-xs sm:text-sm">
-            <div>
-              <div class="flex justify-between items-center mb-1">
-                <label class="font-medium text-slate-300">Monthly Cold Outreach Volume (Emails/mo)</label>
-                <span id="outbound-vol-disp" class="font-bold text-slate-100 font-mono">2,500</span>
-              </div>
-              <input type="range" id="outbound-vol" min="500" max="15000" step="500" value="2500" class="w-full h-1.5 bg-slate-800 rounded-lg cursor-pointer" oninput="calculateAll()">
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
-              <div>
-                <label class="block font-medium text-slate-300 mb-1">Current Positive Reply Rate (%)</label>
-                <div class="relative">
-                  <input type="number" id="current-reply-rate" min="0.1" max="10" step="0.1" value="0.4" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-slate-100 font-mono focus:border-teal-500 focus:outline-none" oninput="calculateAll()">
-                  <span class="absolute right-3 top-1.5 text-slate-500">%</span>
-                </div>
-                <p class="text-[11px] text-slate-500 mt-1">Industry median on mass outreach is 0.4%</p>
-              </div>
-
-              <div>
-                <label class="block font-medium text-slate-300 mb-1">Target Reply Rate (75-Word Matrix)</label>
-                <div class="relative">
-                  <input type="number" id="target-reply-rate" min="1" max="15" step="0.5" value="2.5" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-slate-100 font-mono focus:border-teal-500 focus:outline-none" oninput="calculateAll()">
-                  <span class="absolute right-3 top-1.5 text-slate-500">%</span>
-                </div>
-                <p class="text-[11px] text-teal-400/80 mt-1">Target with trigger-based outbound is 2.5%+</p>
-              </div>
-            </div>
-
-            <div>
-              <label class="block font-medium text-slate-300 mb-1">Average Qualified Opportunity Value (<span class="currency-symbol">$</span>)</label>
-              <input type="number" id="opp-value" min="500" max="50000" step="500" value="3500" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-slate-100 font-mono focus:border-teal-500 focus:outline-none" oninput="calculateAll()">
-            </div>
-          </div>
-        </div>
-
-        <!-- Module 2: Proposals "No Decision" Stall Cost -->
-        <div class="p-6 rounded-xl bg-slate-900 border border-slate-800 shadow-sm print-card">
-          <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
-            <div class="flex items-center space-x-2.5">
-              <span class="w-6 h-6 rounded-md bg-rose-500/10 text-rose-400 flex items-center justify-center font-bold text-xs">2</span>
-              <h2 class="font-bold text-slate-100 text-sm sm:text-base">Proposal "No Decision" Stall Bleed</h2>
-            </div>
-            <span class="text-xs font-medium text-rose-400 bg-rose-500/10 px-2 py-0.5 rounded border border-rose-500/20">The JOLT Effect</span>
-          </div>
-
-          <div class="space-y-4 text-xs sm:text-sm">
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label class="block font-medium text-slate-300 mb-1">Monthly Proposals Delivered</label>
-                <input type="number" id="monthly-proposals" min="1" max="50" step="1" value="8" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-slate-100 font-mono focus:border-teal-500 focus:outline-none" oninput="calculateAll()">
-              </div>
-              <div>
-                <label class="block font-medium text-slate-300 mb-1">Average Deal Size / ACV (<span class="currency-symbol">$</span>)</label>
-                <input type="number" id="deal-acv" min="1000" max="250000" step="1000" value="18000" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-slate-100 font-mono focus:border-teal-500 focus:outline-none" oninput="calculateAll()">
-              </div>
-            </div>
-
-            <div>
-              <div class="flex justify-between items-center mb-1">
-                <label class="font-medium text-slate-300">Deals Stalled in "No Decision" (%)</label>
-                <span id="stall-rate-disp" class="font-bold text-rose-400 font-mono">50%</span>
-              </div>
-              <input type="range" id="stall-rate" min="10" max="80" step="5" value="50" class="w-full h-1.5 bg-slate-800 rounded-lg cursor-pointer" oninput="calculateAll()">
-              <p class="text-[11px] text-slate-500 mt-1">Research shows 40%–60% of proposals freeze due to hedging language and buyer fear of failure.</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Module 3: Retainer Scope Creep & Unbilled Hours -->
-        <div class="p-6 rounded-xl bg-slate-900 border border-slate-800 shadow-sm print-card">
-          <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
-            <div class="flex items-center space-x-2.5">
-              <span class="w-6 h-6 rounded-md bg-purple-500/10 text-purple-400 flex items-center justify-center font-bold text-xs">3</span>
-              <h2 class="font-bold text-slate-100 text-sm sm:text-base">Retainer Scope Creep & Unbilled Delivery</h2>
-            </div>
-            <span class="text-xs font-medium text-purple-400 bg-purple-500/10 px-2 py-0.5 rounded border border-purple-500/20">Margin Protection</span>
-          </div>
-
-          <div class="space-y-4 text-xs sm:text-sm">
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div>
-                <label class="block font-medium text-slate-300 mb-1">Active Accounts / Retainers</label>
-                <input type="number" id="active-accounts" min="1" max="100" step="1" value="6" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-slate-100 font-mono focus:border-teal-500 focus:outline-none" oninput="calculateAll()">
-              </div>
-              <div>
-                <label class="block font-medium text-slate-300 mb-1">Unbilled Hours/Account/Mo</label>
-                <input type="number" id="unbilled-hours" min="1" max="40" step="1" value="10" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-slate-100 font-mono focus:border-teal-500 focus:outline-none" oninput="calculateAll()">
-              </div>
-              <div>
-                <label class="block font-medium text-slate-300 mb-1">Standard Hourly Rate (<span class="currency-symbol">$</span>)</label>
-                <input type="number" id="hourly-rate" min="50" max="500" step="10" value="130" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-slate-100 font-mono focus:border-teal-500 focus:outline-none" oninput="calculateAll()">
-              </div>
-            </div>
-            <p class="text-[11px] text-slate-500">Unbilled revisions, out-of-scope Slack requests, and missing change orders bleed 12%–18% of gross agency margin.</p>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- Forensics Results & Trajectory Column (5 Cols) -->
-      <div class="lg:col-span-5 space-y-6">
-
-        <!-- Chart Card -->
-        <div class="p-6 rounded-xl bg-slate-900 border border-slate-800 shadow-sm print-card">
-          <h3 class="font-bold text-slate-100 text-sm mb-3 flex items-center justify-between">
-            <span>Annual Revenue Trajectory</span>
-            <span class="text-xs font-normal text-slate-400">Current vs Recovered</span>
-          </h3>
-          <div class="h-64 w-full relative">
-            <canvas id="leakageChart"></canvas>
-          </div>
-        </div>
-
-        <!-- Forensics Action Plan Card -->
-        <div class="p-6 rounded-xl bg-slate-900 border border-slate-800 shadow-sm print-card">
-          <h3 class="font-bold text-slate-100 text-sm mb-4 flex items-center space-x-2">
-            <svg class="w-4 h-4 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-            <span>Forensics Recovery Protocol</span>
-          </h3>
-
-          <div class="space-y-3 text-xs">
-            <div class="p-3 rounded-lg bg-slate-950 border border-slate-800 flex items-start space-x-2.5">
-              <span class="w-2 h-2 rounded-full bg-amber-400 mt-1.5 flex-shrink-0"></span>
-              <div>
-                <strong class="text-slate-200">Purge Template Outbound:</strong>
-                <p class="text-slate-400 mt-0.5">Switch from volume spam to 50 weekly observable buying-trigger events using the 75-word 4-sentence matrix.</p>
-              </div>
-            </div>
-
-            <div class="p-3 rounded-lg bg-slate-950 border border-slate-800 flex items-start space-x-2.5">
-              <span class="w-2 h-2 rounded-full bg-rose-400 mt-1.5 flex-shrink-0"></span>
-              <div>
-                <strong class="text-slate-200">Redline 7 Proposal Hedging Verbs:</strong>
-                <p class="text-slate-400 mt-0.5">Eliminate "we aim to" and "reasonable efforts" that trigger buyer indecision. Replace with milestone SLAs and Breakaway options.</p>
-              </div>
-            </div>
-
-            <div class="p-3 rounded-lg bg-slate-950 border border-slate-800 flex items-start space-x-2.5">
-              <span class="w-2 h-2 rounded-full bg-purple-400 mt-1.5 flex-shrink-0"></span>
-              <div>
-                <strong class="text-slate-200">Deploy Change-Order Governance:</strong>
-                <p class="text-slate-400 mt-0.5">Establish automated overage thresholds that convert informal Slack requests into formal billable change orders.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Conversionlogic Solution & CTA Card -->
-        <div class="p-6 rounded-2xl bg-gradient-to-b from-teal-950/40 via-slate-900 to-slate-900 border border-teal-500/30 shadow-lg no-print">
-          <div class="flex items-center space-x-2 text-teal-400 text-xs font-bold uppercase tracking-wider mb-2">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-            <span>Turnkey Recovery Infrastructure</span>
-          </div>
-          <h4 class="text-lg font-bold text-white mb-2">The Elite B2B Sales Architecture OS</h4>
-          <p class="text-xs text-slate-300 leading-relaxed mb-4">
-            Get the complete, battle-tested suite of prompt engines, change-order protocols, and proposal redline frameworks to recapture this leakage immediately.
-          </p>
-
-          <div class="space-y-2.5">
-            <a href="https://payhip.com/b/0Kscf" target="_blank" rel="noopener" class="w-full flex items-center justify-center space-x-2 py-2.5 px-4 rounded-xl bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold text-xs transition shadow-md">
-              <span>Deploy Full B2B Enterprise Architecture</span>
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-            </a>
-            <div class="grid grid-cols-2 gap-2 text-center text-[11px]">
-              <a href="https://promptbase.com/bundle/b2b-deal-momentum-pitch-enabler-kit?via=kevivs" target="_blank" rel="noopener" class="py-2 px-3 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium transition border border-slate-700">
-                PromptBase Pitch Kit ↗
-              </a>
-              <a href="https://medium.com/@conversionlogic" target="_blank" rel="noopener" class="py-2 px-3 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium transition border border-slate-700">
-                Read Deep-Dive ↗
-              </a>
-            </div>
-          </div>
-        </div>
-
-      </div>
-
-    </div>
-
-    <!-- Footer -->
-    <footer class="pt-8 border-t border-slate-800/80 text-center text-xs text-slate-500">
-      <p>© 2026 Conversionlogic. Quantitative Revenue Forensics & B2B Prompt Architectures. Hosted on GitHub Pages.</p>
-    </footer>
-
-  </main>
-
-  <!-- Interactive Calculation Logic & Chart Binding -->
-  <script>
-    let currentCurrency = '$';
-    let chartInstance = null;
-
-    function setCurrency(symbol) {
-      currentCurrency = symbol;
-      document.querySelectorAll('.currency-symbol').forEach(el => el.textContent = symbol);
-      
-      const usdBtn = document.getElementById('curr-usd');
-      const eurBtn = document.getElementById('curr-eur');
-      if (symbol === '$') {
-        usdBtn.className = 'px-2.5 py-1 rounded bg-teal-500 text-slate-950 transition font-bold';
-        eurBtn.className = 'px-2.5 py-1 rounded text-slate-300 hover:text-white transition';
-      } else {
-        eurBtn.className = 'px-2.5 py-1 rounded bg-teal-500 text-slate-950 transition font-bold';
-        usdBtn.className = 'px-2.5 py-1 rounded text-slate-300 hover:text-white transition';
-      }
-      calculateAll();
+  var MODULES = [
+    { id: 'outbound', n: 1, color: '#1F4E79', name: 'Cold outreach',
+      title: 'Cold outreach upside', sub: 'The gap between your positive reply rate and what trigger-based messaging can reach.',
+      fields: [
+        { k: 'o_vol', label: 'Emails sent per month', hint: 'All cold emails across every mailbox.', min: 250, max: 20000, step: 250, def: 2000, type: 'int' },
+        { k: 'o_cur', label: 'Positive reply rate today', hint: 'Interested replies as a share of emails sent, not total replies.', min: 0.1, max: 5, step: 0.1, def: 0.5, type: 'pct1' },
+        { k: 'o_tgt', label: 'Reply rate you could reach', hint: 'Keep this modest. A 1 to 2 point lift is realistic for well-targeted outreach.', min: 0.2, max: 8, step: 0.1, def: 1.5, type: 'pct1' },
+        { k: 'o_acv', label: 'Average first-year contract value', hint: 'What one new client is worth in their first year.', min: 1000, max: 100000, step: 500, def: 12000, type: 'money' }
+      ],
+      warn: function (s) { return s.o_tgt <= s.o_cur ? 'The target rate is at or below todayβ€™s rate, so no outreach upside is modelled.' : ''; },
+      how: function (s, c) {
+        return 'Extra positive replies Γ— share that become meetings Γ— meeting close rate Γ— contract value Γ— 12 months.' +
+          '<code>' + fmtInt(s.o_vol) + ' emails Γ— ' + (Math.max(0, s.o_tgt - s.o_cur)).toFixed(1) + ' pt lift = ' + c.extraReplies.toFixed(1) + ' extra replies/mo β†’ ' +
+          c.meetings.toFixed(1) + ' meetings β†’ ' + c.deals.toFixed(2) + ' deals/mo Γ— ' + full(s.o_acv) + ' Γ— 12 = ' + full(c.outbound) + '</code>';
+      },
+      action: { t: 'Rebuild outreach around triggers', d: 'Write about a specific, observable event at the prospect instead of filtering by headcount, and check list freshness first so bounces do not cap your results.', href: 'https://medium.com/@conversionlogic/why-your-cold-outreach-died-this-year-and-the-3-step-trigger-framework-that-revives-it-08bf79bd1cb2', l: 'Read the trigger framework' }
+    },
+    { id: 'proposals', n: 2, color: '#C2542D', name: 'Stalled proposals',
+      title: 'Proposals stalling in β€no decisionβ€', sub: 'Qualified deals that go quiet instead of being won or lost to a competitor.',
+      fields: [
+        { k: 'p_cnt', label: 'Proposals sent per month', hint: 'Formal proposals or quotes to qualified buyers.', min: 1, max: 40, step: 1, def: 6, type: 'int' },
+        { k: 'p_acv', label: 'Average proposal value', hint: 'First-year value of a typical proposal.', min: 2000, max: 250000, step: 1000, def: 20000, type: 'money' },
+        { k: 'p_stall', label: 'Share that end in β€no decisionβ€', hint: 'Check your CRM. Many B2B teams see 40% or more of qualified deals stall without a competitor winning.', min: 5, max: 70, step: 1, def: 40, type: 'pct0' }
+      ],
+      warn: function () { return ''; },
+      how: function (s, c) {
+        return 'Proposals per year Γ— value Γ— share stalled Γ— share you could realistically recover.' +
+          '<code>' + fmtInt(s.p_cnt) + ' Γ— 12 Γ— ' + full(s.p_acv) + ' Γ— ' + Math.round(s.p_stall) + '% = ' + full(c.stalledVal) + ' stalled Γ— ' + Math.round(s.a_rec) + '% recoverable = ' + full(c.proposals) + '</code>';
+      },
+      action: { t: 'Remove hedging from proposals', d: 'Replace phrases such as β€we aim toβ€ and β€reasonable effortsβ€ with specific commitments, and give the buying committee a safe way to say yes: milestones, a defined exit and named owners.', href: 'https://promptbase.com/bundle/b2b-deal-momentum-pitch-enabler-kit?via=kevivs', l: 'See the deal momentum kit' }
+    },
+    { id: 'scope', n: 3, color: '#B8892B', name: 'Unbilled scope work',
+      title: 'Unbilled scope work', sub: 'Out-of-scope requests and revisions delivered without a change order.',
+      fields: [
+        { k: 's_acc', label: 'Active retainers or projects', hint: 'Clients currently being served.', min: 1, max: 50, step: 1, def: 5, type: 'int' },
+        { k: 's_hrs', label: 'Unbilled hours per client per month', hint: 'Extra rounds, quick favours and out-of-scope requests. Check your time logs.', min: 1, max: 30, step: 1, def: 6, type: 'hrs' },
+        { k: 's_rate', label: 'Your standard hourly rate', hint: 'What you would charge for this work if it were billed.', min: 30, max: 400, step: 5, def: 120, type: 'money' }
+      ],
+      warn: function () { return ''; },
+      how: function (s, c) {
+        return 'Clients Γ— unbilled hours Γ— hourly rate Γ— 12 months Γ— share you could realistically bill.' +
+          '<code>' + fmtInt(s.s_acc) + ' Γ— ' + fmtInt(s.s_hrs) + ' h Γ— ' + full(s.s_rate) + ' Γ— 12 Γ— ' + Math.round(s.a_bill) + '% = ' + full(c.scope) + '</code>';
+      },
+      action: { t: 'Put change orders in writing', d: 'Define scope in a short charter and require a priced change order once a request passes an agreed hours threshold.', href: 'https://promptbase.com/bundle/GwMrS1tUZt0JfYNYNpLj?via=kevivs', l: 'See the scope-control kit' }
     }
+  ];
 
-    function formatNumber(num) {
-      return num.toLocaleString('en-US', { maximumFractionDigits: 0 });
+  var ASSUME = [
+    { k: 'a_meet', label: 'Positive reply β†’ meeting held', hint: 'Share of interested replies that turn into a real conversation.', min: 5, max: 80, step: 1, def: 30, type: 'pct0' },
+    { k: 'a_win', label: 'Meeting β†’ closed-won', hint: 'Close rate on qualified first meetings.', min: 2, max: 60, step: 1, def: 15, type: 'pct0' },
+    { k: 'a_rec', label: 'Stalled proposals you could recover', hint: 'Not every stalled deal can be saved. This is the realistic share.', min: 5, max: 60, step: 1, def: 20, type: 'pct0' },
+    { k: 'a_bill', label: 'Unbilled hours you could bill', hint: 'Some goodwill work is worth keeping. This is the billable share.', min: 20, max: 100, step: 5, def: 70, type: 'pct0' },
+    { k: 'a_cons', label: 'Conservative case, as % of expected', hint: 'Sets the low end of the range shown at the top.', min: 20, max: 90, step: 5, def: 50, type: 'pct0' }
+  ];
+
+  var ALL = [];
+  MODULES.forEach(function (m) { m.fields.forEach(function (f) { ALL.push(f); }); });
+  ASSUME.forEach(function (f) { ALL.push(f); });
+  var byKey = {}; ALL.forEach(function (f) { byKey[f.k] = f; });
+  var state = {}; ALL.forEach(function (f) { state[f.k] = f.def; });
+  var cur = '$';
+  var firstRender = true;
+
+  /* ---------- formatting ---------- */
+  var nf = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 });
+  function fmtInt(v) { return nf.format(Math.round(v)); }
+  function full(v) { return cur + nf.format(Math.round(v)); }
+  function compact(v) {
+    var a = Math.abs(v), s;
+    if (a >= 1e6) s = (v / 1e6).toFixed(a >= 1e7 ? 0 : 1).replace(/\.0$/, '') + 'M';
+    else if (a >= 1e5) s = Math.round(v / 1e3) + 'K';
+    else if (a >= 1e3) s = (v / 1e3).toFixed(1).replace(/\.0$/, '') + 'K';
+    else s = String(Math.round(v));
+    return cur + s;
+  }
+  function fieldText(f, v) {
+    if (f.type === 'pct1') return (Math.round(v * 10) / 10).toFixed(1);
+    return fmtInt(v);
+  }
+
+  /* ---------- build UI ---------- */
+  function fieldHTML(f, color) {
+    var pre = f.type === 'money' ? '<span class="aff cur"></span>' : '';
+    var suf = (f.type === 'pct1' || f.type === 'pct0') ? '<span class="aff">%</span>' : (f.type === 'hrs' ? '<span class="aff">h</span>' : '');
+    return '<div class="field" style="--mc:' + color + '">' +
+      '<div class="field-top"><label for="' + f.k + '">' + f.label + '</label>' +
+      '<div class="num">' + pre + '<input id="' + f.k + '" data-k="' + f.k + '" type="text" inputmode="decimal" autocomplete="off" aria-describedby="' + f.k + '_h">' + suf + '</div></div>' +
+      '<p class="hint" id="' + f.k + '_h">' + f.hint + '</p>' +
+      '<input class="range" id="' + f.k + '_r" data-k="' + f.k + '" type="range" min="' + f.min + '" max="' + f.max + '" step="' + f.step + '" aria-label="' + f.label + ' slider">' +
+      '</div>';
+  }
+  function build() {
+    $('#modules').innerHTML = MODULES.map(function (m) {
+      return '<section class="card mod" aria-labelledby="mh_' + m.id + '">' +
+        '<div class="mod-h"><span class="badge" style="background:' + m.color + '">' + m.n + '</span>' +
+        '<div><h2 id="mh_' + m.id + '">' + m.title + '</h2><p>' + m.sub + '</p></div></div>' +
+        m.fields.map(function (f) { return fieldHTML(f, m.color); }).join('') +
+        '<div class="warn" id="warn_' + m.id + '" role="status"></div>' +
+        '<details class="how"><summary>How this is calculated</summary><div class="calc" id="how_' + m.id + '"></div></details>' +
+        '</section>';
+    }).join('');
+    $('#assumptions').innerHTML = ASSUME.map(function (f) { return fieldHTML(f, '#0B6B5B'); }).join('');
+  }
+
+  /* ---------- model ---------- */
+  function compute(s) {
+    var delta = Math.max(0, s.o_tgt - s.o_cur) / 100;
+    var extraReplies = s.o_vol * delta;
+    var meetings = extraReplies * s.a_meet / 100;
+    var deals = meetings * s.a_win / 100;
+    var outbound = deals * s.o_acv * 12;
+    var stalledVal = s.p_cnt * 12 * s.p_acv * s.p_stall / 100;
+    var proposals = stalledVal * s.a_rec / 100;
+    var scope = s.s_acc * s.s_hrs * s.s_rate * 12 * s.a_bill / 100;
+    var total = outbound + proposals + scope;
+    return { extraReplies: extraReplies, meetings: meetings, deals: deals, outbound: outbound, stalledVal: stalledVal,
+             proposals: proposals, scope: scope, total: total, low: total * s.a_cons / 100,
+             parts: { outbound: outbound, proposals: proposals, scope: scope } };
+  }
+
+  /* ---------- rendering ---------- */
+  function tween(el, to, fmt) {
+    var from = el._v == null ? to : el._v;
+    el._v = to;
+    cancelAnimationFrame(el._raf);
+    if (reduce || firstRender || from === to) { el.textContent = fmt(to); return; }
+    var t0 = performance.now(), d = 380;
+    (function step(now) {
+      var p = Math.min(1, (now - t0) / d), e = 1 - Math.pow(1 - p, 3);
+      el.textContent = fmt(from + (to - from) * e);
+      if (p < 1) el._raf = requestAnimationFrame(step);
+    })(t0);
+  }
+
+  function niceMax(v) {
+    if (v <= 0) return 1;
+    var mag = Math.pow(10, Math.floor(Math.log(v) / Math.LN10));
+    var n = v / mag, steps = [1, 1.2, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10];
+    for (var i = 0; i < steps.length; i++) if (n <= steps[i]) return steps[i] * mag;
+    return 10 * mag;
+  }
+
+  var chartGeo = null;
+  function renderChart(total, low) {
+    var W = 560, H = 230, L = 54, R = 14, T = 14, B = 30, iw = W - L - R, ih = H - T - B;
+    var max = niceMax(total);
+    var x = function (m) { return L + iw * m / 12; };
+    var y = function (v) { return T + ih * (1 - v / max); };
+    chartGeo = { W: W, L: L, iw: iw, x: x, y: y, total: total, low: low };
+    var grid = '', i;
+    for (i = 0; i <= 2; i++) {
+      var gv = max * i / 2, gy = y(gv);
+      grid += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + gy + '" y2="' + gy + '" stroke="#E7E3D8" stroke-width="1"/>' +
+        '<text x="' + (L - 8) + '" y="' + (gy + 4) + '" text-anchor="end" font-size="14" fill="#5B6773">' + compact(gv) + '</text>';
     }
-
-    function formatMoney(num) {
-      return currentCurrency + formatNumber(num);
-    }
-
-    function calculateAll() {
-      // 1. Outbound Loss Calculation
-      const outboundVol = parseFloat(document.getElementById('outbound-vol').value) || 0;
-      document.getElementById('outbound-vol-disp').textContent = formatNumber(outboundVol);
-      
-      const curReplyRate = (parseFloat(document.getElementById('current-reply-rate').value) || 0) / 100;
-      const targetReplyRate = (parseFloat(document.getElementById('target-reply-rate').value) || 0) / 100;
-      const oppValue = parseFloat(document.getElementById('opp-value').value) || 0;
-
-      const monthlyCurReplies = outboundVol * curReplyRate;
-      const monthlyTargetReplies = outboundVol * targetReplyRate;
-      const deltaReplies = Math.max(0, monthlyTargetReplies - monthlyCurReplies);
-      
-      // Assuming 30% of positive replies turn into qualified pipeline meetings
-      const lostOpportunitiesMonthly = deltaReplies * 0.30;
-      const annualOutboundLoss = lostOpportunitiesMonthly * oppValue * 12;
-
-      // 2. Proposal "No Decision" Stall Cost
-      const monthlyProposals = parseFloat(document.getElementById('monthly-proposals').value) || 0;
-      const dealACV = parseFloat(document.getElementById('deal-acv').value) || 0;
-      const stallRate = (parseFloat(document.getElementById('stall-rate').value) || 0) / 100;
-      document.getElementById('stall-rate-disp').textContent = Math.round(stallRate * 100) + '%';
-
-      // Deals frozen in No Decision that could be closed with proper de-risking (assuming 40% win recovery)
-      const annualProposalPipeline = monthlyProposals * 12 * dealACV;
-      const stalledAnnualVolume = annualProposalPipeline * stallRate;
-      const annualProposalLoss = stalledAnnualVolume * 0.40; // Recoverable ARR
-
-      // 3. Scope Creep & Unbilled Delivery
-      const activeAccounts = parseFloat(document.getElementById('active-accounts').value) || 0;
-      const unbilledHours = parseFloat(document.getElementById('unbilled-hours').value) || 0;
-      const hourlyRate = parseFloat(document.getElementById('hourly-rate').value) || 0;
-
-      const monthlyScopeLoss = activeAccounts * unbilledHours * hourlyRate;
-      const annualScopeLoss = monthlyScopeLoss * 12;
-
-      // Totals
-      const totalAnnualLeakage = annualOutboundLoss + annualProposalLoss + annualScopeLoss;
-      const totalMonthlyLeakage = totalAnnualLeakage / 12;
-
-      // Update DOM
-      document.getElementById('total-annual-leakage').textContent = formatMoney(totalAnnualLeakage);
-      document.getElementById('monthly-leakage-stat').textContent = formatMoney(totalMonthlyLeakage);
-      document.getElementById('kpi-outbound').textContent = formatMoney(annualOutboundLoss);
-      document.getElementById('kpi-proposals').textContent = formatMoney(annualProposalLoss);
-      document.getElementById('kpi-scope').textContent = formatMoney(annualScopeLoss);
-
-      updateChart(annualOutboundLoss, annualProposalLoss, annualScopeLoss);
-    }
-
-    function updateChart(outboundLoss, proposalLoss, scopeLoss) {
-      const ctx = document.getElementById('leakageChart').getContext('2d');
-      
-      const recoveredARR = (outboundLoss + proposalLoss + scopeLoss) * 0.85; // Realistic recaptured ARR
-      
-      if (chartInstance) {
-        chartInstance.destroy();
-      }
-
-      chartInstance = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-          labels: ['Stalled Proposals', 'Outbound Loss', 'Scope Creep'],
-          datasets: [{
-            data: [proposalLoss, outboundLoss, scopeLoss],
-            backgroundColor: [
-              '#f43f5e', // Rose
-              '#fbbf24', // Amber
-              '#c084fc'  // Purple
-            ],
-            borderColor: '#0f172a',
-            borderWidth: 3,
-            hoverOffset: 6
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          cutout: '70%',
-          plugins: {
-            legend: {
-              position: 'bottom',
-              labels: {
-                boxWidth: 12,
-                padding: 16,
-                color: '#94a3b8',
-                font: { size: 11, family: 'Inter' }
-              }
-            },
-            tooltip: {
-              callbacks: {
-                label: function(context) {
-                  return ' ' + context.label + ': ' + currentCurrency + formatNumber(context.raw);
-                }
-              }
-            }
-          }
-        }
-      });
-    }
-
-    // Initialize on page load
-    window.addEventListener('DOMContentLoaded', () => {
-      calculateAll();
+    var xl = '';
+    [0, 3, 6, 9, 12].forEach(function (m) {
+      xl += '<text x="' + x(m) + '" y="' + (H - 8) + '" text-anchor="middle" font-size="14" fill="#5B6773">' + (m === 0 ? 'Today' : 'Month ' + m) + '</text>';
     });
-  </script>
+    var area = 'M' + x(0) + ',' + y(0) + ' L' + x(12) + ',' + y(total) + ' L' + x(12) + ',' + y(0) + ' Z';
+    $('#chart').innerHTML =
+      '<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0B6B5B" stop-opacity=".28"/><stop offset="1" stop-color="#0B6B5B" stop-opacity="0"/></linearGradient></defs>' +
+      grid + xl +
+      '<path d="' + area + '" fill="url(#g)"/>' +
+      '<line x1="' + x(0) + '" y1="' + y(0) + '" x2="' + x(12) + '" y2="' + y(low) + '" stroke="#7A8794" stroke-width="2" stroke-dasharray="5 5"/>' +
+      '<line x1="' + x(0) + '" y1="' + y(0) + '" x2="' + x(12) + '" y2="' + y(total) + '" stroke="#0B6B5B" stroke-width="3" stroke-linecap="round"/>' +
+      '<circle id="hc" r="5.5" fill="#fff" stroke="#0B6B5B" stroke-width="3" cx="0" cy="0" style="display:none"/>' +
+      '<rect id="hit" x="' + L + '" y="' + T + '" width="' + iw + '" height="' + ih + '" fill="transparent"/>';
+  }
+  function chartHover(e) {
+    if (!chartGeo) return;
+    var svg = $('#chart'), r = svg.getBoundingClientRect(), g = chartGeo;
+    var px = (e.clientX - r.left) * (g.W / r.width);
+    var m = Math.max(0, Math.min(12, Math.round((px - g.L) / g.iw * 12)));
+    var ev = g.total * m / 12, cv = g.low * m / 12;
+    var hc = $('#hc'); hc.setAttribute('cx', g.x(m)); hc.setAttribute('cy', g.y(ev)); hc.style.display = '';
+    var tt = $('#tt'), wr = $('#chartWrap').getBoundingClientRect();
+    tt.innerHTML = '<b>' + (m === 0 ? 'Today' : 'Month ' + m) + '</b><br>' + compact(ev) + ' expected Β· ' + compact(cv) + ' conservative';
+    tt.style.left = (g.x(m) * r.width / g.W) + 'px';
+    tt.style.top = (g.y(ev) * r.height / (230)) + 'px';
+    tt.style.opacity = 1;
+  }
+  function chartLeave() { $('#tt').style.opacity = 0; var hc = $('#hc'); if (hc) hc.style.display = 'none'; }
+
+  var liveTimer;
+  function render() {
+    var c = compute(state);
+    tween($('#lo'), c.low, compact);
+    tween($('#hi'), c.total, compact);
+    tween($('#perMonth'), c.total / 12, compact);
+    tween($('#mbarV'), c.total, function (v) { return compact(c.low) + ' β€“ ' + compact(v); });
+    $('#mbarV').textContent = compact(c.low) + ' β€“ ' + compact(c.total);
+
+    var total = c.total || 1;
+    $('#bar').innerHTML = MODULES.map(function (m) {
+      return '<span style="width:' + (c.parts[m.id] / total * 100) + '%;background:' + m.color + '"></span>';
+    }).join('');
+    $('#rows').innerHTML = MODULES.map(function (m) {
+      var v = c.parts[m.id];
+      return '<li><span class="dot" style="background:' + m.color + '"></span><span>' + m.name + '</span><span class="v">' + compact(v) + '</span><span class="pc">' + Math.round(v / total * 100) + '%</span></li>';
+    }).join('');
+
+    renderChart(c.total, c.low);
+
+    var ranked = MODULES.slice().sort(function (a, b) { return c.parts[b.id] - c.parts[a.id]; });
+    $('#start').innerHTML = ranked.map(function (m, i) {
+      return '<li><span class="rk" style="background:' + m.color + '">' + (i + 1) + '</span><div>' +
+        '<h4>' + m.action.t + '<span>' + compact(c.parts[m.id]) + '</span></h4>' +
+        '<p>' + m.action.d + '</p>' +
+        '<a href="' + m.action.href + '" target="_blank" rel="noopener noreferrer">' + m.action.l + ' β†’</a></div></li>';
+    }).join('');
+
+    MODULES.forEach(function (m) {
+      $('#how_' + m.id).innerHTML = m.how(state, c);
+      var w = $('#warn_' + m.id), msg = m.warn(state);
+      w.textContent = msg; w.classList.toggle('on', !!msg);
+    });
+
+    clearTimeout(liveTimer);
+    liveTimer = setTimeout(function () {
+      $('#live').textContent = 'Estimated annual revenue at stake: ' + compact(c.low) + ' to ' + compact(c.total) + '.';
+    }, 700);
+    firstRender = false;
+    persist();
+    return c;
+  }
+
+  /* ---------- inputs ---------- */
+  function setRangeFill(k) {
+    var f = byKey[k], r = $('#' + k + '_r');
+    var p = Math.max(0, Math.min(100, (state[k] - f.min) / (f.max - f.min) * 100));
+    r.style.setProperty('--p', p + '%');
+  }
+  function syncField(k, skipText) {
+    var f = byKey[k], r = $('#' + k + '_r');
+    r.value = state[k]; setRangeFill(k);
+    if (!skipText) $('#' + k).value = fieldText(f, state[k]);
+  }
+  function syncAll() { ALL.forEach(function (f) { syncField(f.k); }); $$('.cur').forEach(function (e) { e.textContent = cur; }); }
+
+  document.addEventListener('input', function (e) {
+    var t = e.target; if (!t.dataset || !t.dataset.k) return;
+    var k = t.dataset.k, f = byKey[k], v;
+    if (t.classList.contains('range')) { v = parseFloat(t.value); state[k] = v; syncField(k); }
+    else {
+      v = parseFloat(String(t.value).replace(/,/g, ''));
+      if (!isFinite(v) || v < 0) return;
+      state[k] = Math.min(v, f.max * 50); syncField(k, true);
+    }
+    render();
+  });
+  document.addEventListener('change', function (e) {
+    var t = e.target; if (t.dataset && t.dataset.k && !t.classList.contains('range')) {
+      var k = t.dataset.k; if (!isFinite(state[k])) state[k] = byKey[k].def; syncField(k);
+    }
+  });
+  document.addEventListener('focusin', function (e) { if (e.target.matches && e.target.matches('.num input')) e.target.select(); });
+
+  $$('.seg button').forEach(function (b) {
+    b.addEventListener('click', function () {
+      cur = b.dataset.cur;
+      $$('.seg button').forEach(function (x) { x.setAttribute('aria-checked', x === b ? 'true' : 'false'); });
+      $$('.cur').forEach(function (e) { e.textContent = cur; });
+      render();
+    });
+  });
+
+  /* ---------- share state ---------- */
+  function persist() {
+    var p = new URLSearchParams();
+    ALL.forEach(function (f) { if (state[f.k] !== f.def) p.set(f.k, state[f.k]); });
+    if (cur === 'β‚¬') p.set('c', 'eur');
+    var h = p.toString();
+    try { history.replaceState(null, '', h ? '#' + h : location.pathname + location.search); } catch (e) {}
+  }
+  function restore() {
+    var p = new URLSearchParams(location.hash.replace(/^#/, ''));
+    ALL.forEach(function (f) {
+      if (p.has(f.k)) { var v = parseFloat(p.get(f.k)); if (isFinite(v) && v >= 0) state[f.k] = Math.min(v, f.max * 50); }
+    });
+    if (p.get('c') === 'eur') {
+      cur = 'β‚¬';
+      $$('.seg button').forEach(function (x) { x.setAttribute('aria-checked', x.dataset.cur === 'β‚¬' ? 'true' : 'false'); });
+    }
+  }
+
+  /* ---------- actions ---------- */
+  function toast(msg) {
+    var t = $('#toast'); t.textContent = msg; t.classList.add('on');
+    clearTimeout(toast._t); toast._t = setTimeout(function () { t.classList.remove('on'); }, 2200);
+  }
+  function copyText(text, ok) {
+    function fallback() {
+      var ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); toast(ok); } catch (e) { toast('Copy failed. Select and copy manually.'); }
+      document.body.removeChild(ta);
+    }
+    if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(text).then(function () { toast(ok); }, fallback);
+    else fallback();
+  }
+  $('#bCopy').addEventListener('click', function () {
+    var c = compute(state);
+    var lines = ['Revenue Leakage Diagnostic (Conversionlogic)',
+      'Estimated annual revenue at stake: ' + compact(c.low) + ' to ' + compact(c.total) + ' (conservative to expected)', ''];
+    MODULES.forEach(function (m) { lines.push('- ' + m.name + ': ' + compact(c.parts[m.id]) + ' per year'); });
+    lines.push('', 'Key assumptions: ' + state.a_meet + '% of positive replies become meetings, ' + state.a_win + '% of meetings close, ' +
+      state.a_rec + '% of stalled proposals recoverable, ' + state.a_bill + '% of unbilled hours billable.',
+      'Illustrative model, not a forecast.', location.href);
+    copyText(lines.join('\n'), 'Summary copied');
+  });
+  $('#bLink').addEventListener('click', function () { persist(); copyText(location.href, 'Link copied'); });
+  $('#bPrint').addEventListener('click', function () {
+    $('#printMeta').textContent = 'Prepared ' + new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) + ' with the Conversionlogic Revenue Leakage Diagnostic';
+    window.print();
+  });
+
+  /* ---------- chart + mobile bar wiring ---------- */
+  var cw = $('#chartWrap');
+  cw.addEventListener('pointermove', chartHover);
+  cw.addEventListener('pointerleave', chartLeave);
+
+  if ('IntersectionObserver' in window) {
+    var mbar = $('#mbar');
+    new IntersectionObserver(function (en) { mbar.classList.toggle('show', !en[0].isIntersecting); }, { threshold: 0.05 }).observe($('#results'));
+  }
+
+  /* ---------- init ---------- */
+  build();
+  restore();
+  syncAll();
+  render();
+})();
+</script>
 </body>
 </html>
