@@ -305,7 +305,7 @@ footer p{margin:0 0 6px;max-width:860px}
         { k: 'o_tgt', label: 'Reply rate you could reach', hint: 'Keep this modest. A 1 to 2 point lift is realistic for well-targeted outreach.', min: 0.2, max: 8, step: 0.1, def: 1.5, type: 'pct1' },
         { k: 'o_acv', label: 'Average first-year contract value', hint: 'What one new client is worth in their first year.', min: 1000, max: 100000, step: 500, def: 12000, type: 'money' }
       ],
-      warn: function (s) { return s.o_tgt <= s.o_cur ? 'The target rate is at or below today's rate, so no outreach upside is modelled.' : ''; },
+      warn: function (s) { return s.o_tgt <= s.o_cur ? "The target rate is at or below today's rate, so no outreach upside is modelled." : ''; },
       how: function (s, c) {
         return 'Extra positive replies × share that become meetings × meeting close rate × contract value × 12 months.' +
           '<code>' + fmtInt(s.o_vol) + ' emails × ' + (Math.max(0, s.o_tgt - s.o_cur)).toFixed(1) + ' pt lift = ' + c.extraReplies.toFixed(1) + ' extra replies/mo → ' +
